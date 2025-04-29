@@ -135,6 +135,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "de.htw-berlin.cave": {
+      "version": "https://github.com/FKI-HTW/CAVE.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5775aaa987092b61642ea13ebdf4903d24351eb3"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
