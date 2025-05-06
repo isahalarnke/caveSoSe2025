@@ -33,6 +33,31 @@ public class PositionTransfer : MonoBehaviour
             {
                 Debug.Log("Player gefunden und Position: " + actor.transform.position);
 
+
+                head = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Neck/Head");
+                hipRight = actor.transform.Find("Spine Base/Hip Right");
+                hipLeft = actor.transform.Find("Spine Base/Hip Left");
+                spineBase = actor.transform.Find("Spine Base");
+
+                if (head != null)
+                {
+                    CreateCubeAtPosition(head.position, "HeadCube", head);
+                }
+
+                if (hipRight != null)
+                {
+                    CreateCubeAtPosition(hipRight.position, "HipRightCube", hipRight);
+                }
+
+                if (hipLeft != null)
+                {
+                    CreateCubeAtPosition(hipLeft.position, "HipLeftCube", hipLeft);
+                }
+
+                if (spineBase != null)
+                {
+                    CreateCubeAtPosition(spineBase.position, "SpineBaseCube", spineBase);
+                }
             }
         }
 
@@ -41,31 +66,6 @@ public class PositionTransfer : MonoBehaviour
         {
             Vector3 position = actor.transform.position;
             Debug.Log("Aktuelle Position von Player: " + position);
-
-            head = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Neck/Head");
-            hipRight = actor.transform.Find("Spine Base/Hip Right");
-            hipLeft = actor.transform.Find("Spine Base/Hip Left");
-            spineBase = actor.transform.Find("Spine Base");
-
-            if (head != null)
-            {
-                CreateCubeAtPosition(head.position, "HeadCube", head);
-            }
-
-            if (hipRight != null)
-            {
-                CreateCubeAtPosition(hipRight.position, "HipRightCube", hipRight);
-            }
-
-            if (hipLeft != null)
-            {
-                CreateCubeAtPosition(hipLeft.position, "HipLeftCube", hipLeft);
-            }
-
-            if (spineBase != null)
-            {
-                CreateCubeAtPosition(spineBase.position, "SpineBaseCube", spineBase);
-            }
 
         }
     }
@@ -76,7 +76,7 @@ public class PositionTransfer : MonoBehaviour
     {
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-        position.z += 0.6f;
+        position.z += 1.3f;
 
         cube.transform.position = position;
 
