@@ -423,7 +423,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f29bca5f01532544e9a3565dd8c2a250, type: 3}
---- !u!1001 &1388379408
+--- !u!1001 &2059071261
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -474,11 +474,7 @@ PrefabInstance:
     - target: {fileID: 5135390767285829288, guid: bbc71a473e7cc0c44abf394308e7d278, type: 3}
       propertyPath: prefab
       value: 
-      objectReference: {fileID: 8920511239535695783, guid: 0346aef87424bff44b117f415acdd8db, type: 3}
-    - target: {fileID: 5135390767285829288, guid: bbc71a473e7cc0c44abf394308e7d278, type: 3}
-      propertyPath: constructionType
-      value: 2
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8920511239535695783, guid: 7fd5e0d2ee04f004dbbcbe2be49beefe, type: 3}
     - target: {fileID: 6418373020627977740, guid: bbc71a473e7cc0c44abf394308e7d278, type: 3}
       propertyPath: m_Name
       value: CAVE
@@ -495,5 +491,5 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 948237271}
   - {fileID: 372890007}
-  - {fileID: 1388379408}
   - {fileID: 296497177}
+  - {fileID: 2059071261}
