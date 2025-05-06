@@ -15,10 +15,7 @@ public class PositionTransfer : MonoBehaviour
         {
             Debug.Log("Player Position beim Start: " + actor.transform.position);
         }
-        else
-        {
-            Debug.LogError("Player nicht gefunden beim Start!");
-        }
+        
     }
 
     // Update is called once per frame
