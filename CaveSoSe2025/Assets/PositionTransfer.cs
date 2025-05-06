@@ -9,21 +9,32 @@ public class PositionTransfer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         actor = GameObject.FindGameObjectWithTag("Player");
-
-        if (actor == null)
+        if (actor != null)
         {
-            Debug.LogError("Player nicht gefunden!");
+            Debug.Log("Player Position beim Start: " + actor.transform.position);
         }
         else
         {
-            Debug.Log("Player Position: " + actor.transform.position);
+            Debug.LogError("Player nicht gefunden beim Start!");
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+       
+        if (actor == null)
+        {
+            actor = GameObject.FindGameObjectWithTag("Player");
+            if (actor != null)
+            {
+                Debug.Log("Player gefunden und Position: " + actor.transform.position);
+            }
+        }
+
+       
         if (actor != null)
         {
             Vector3 position = actor.transform.position;

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ActorHead
   - CubeSpawner
+  - TestActor
   layers:
   - Default
   - TransparentFX
