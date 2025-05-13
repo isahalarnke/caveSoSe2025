@@ -53,7 +53,7 @@ public class PositionTransfer : MonoBehaviour
                 head = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Neck/Head");
                 neck = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Neck");
                 spineBase = actor.transform.Find("Spine Base");
-                spineMid = actor.transform.Find("Spine Base/Spine Mid")
+                spineMid = actor.transform.Find("Spine Base/Spine Mid");
                 hipRight = actor.transform.Find("Spine Base/Hip Right");
                 hipLeft = actor.transform.Find("Spine Base/Hip Left");
                 kneeLeft = actor.transform.Find("Spine Base/Hip Left/Knee Left");
