@@ -9,6 +9,10 @@ public class PositionTransfer : MonoBehaviour
     private Transform handLeft, handRight, kneeLeft, kneeRight;
     private Transform ankleLeft, ankleRight, footLeft, footRight;
 
+    public Vector3 mirrorPlanePoint = new Vector3(0, 0, 0);
+    public Vector3 mirrorNormal = Vector3.forward;
+    public GameObject handPrefab;
+
     //Dictionariey of the avatar objects and lines that should be updated per frame
     private Dictionary<string, GameObject> jointCubes = new Dictionary<string, GameObject>();
     private Dictionary<string, LineRenderer> jointLines = new Dictionary<string, LineRenderer>();
@@ -111,17 +115,40 @@ public class PositionTransfer : MonoBehaviour
 
         if (!jointCubes.ContainsKey(name))
         {
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject cube;
+            if (name == "HandLeftCube" || name == "HandRightCube")
+            {
+            cube = Instantiate(handPrefab);
+            }
+            else{
+                cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                Renderer renderer = cube.GetComponent<Renderer>();
+                renderer.material.color = new Color(1f, 0.41f, 0.71f); 
+            }
+
             cube.name = name;
-            cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            Renderer renderer = cube.GetComponent<Renderer>();
-            renderer.material.color = new Color(1f, 0.41f, 0.71f);
+            if (cube.GetComponent<Rigidbody>() ==null)
+            {
+                Rigidbody rb = cube.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+            }
+            if (cube.GetComponent<Collider>() == null)
+            {
+                cube.AddComponent<BoxCollider>();
+                Debug.Log("Collider");
+            }
+            cube.AddComponent<BodyCollision>();
+
             jointCubes[name] = cube;
         }
 
-        // Offset z-axis for teh avatar visualization
-        Vector3 offsetPosition = joint.position + new Vector3(0, 0, 1.3f);
-        jointCubes[name].transform.position = offsetPosition;
+        // Offset z-axis for th avatar visualization
+        /*Vector3 offsetPosition = joint.position + new Vector3(0, 0, 1.3f);
+        jointCubes[name].transform.position = offsetPosition;*/
+        Vector3 mirroredPosition = MirrorJoint(joint.position, mirrorPlanePoint, mirrorNormal);
+        jointCubes[name].transform.position = mirroredPosition;
+
     }
 
     //Visualization between joints, updates start and end position of line or instatiated depending if actor or joints and lines are already instantiated
@@ -142,10 +169,22 @@ public class PositionTransfer : MonoBehaviour
             jointLines[name] = lr;
         }
 
-        Vector3 posA = jointA.position + new Vector3(0, 0, 1.3f);
+       /* Vector3 posA = jointA.position + new Vector3(0, 0, 1.3f);
         Vector3 posB = jointB.position + new Vector3(0, 0, 1.3f);
 
         jointLines[name].SetPosition(0, posA);
-        jointLines[name].SetPosition(1, posB);
+        jointLines[name].SetPosition(1, posB);*/
+        Vector3 mirroredA = MirrorJoint(jointA.position, mirrorPlanePoint, mirrorNormal);
+        Vector3 mirroredB = MirrorJoint(jointB.position, mirrorPlanePoint, mirrorNormal);
+        jointLines[name].SetPosition(0, mirroredA);
+        jointLines[name].SetPosition(1, mirroredB);
+    }
+
+    Vector3 MirrorJoint(Vector3 point, Vector3 planePoint, Vector3 planeNormal){
+        Vector3 n = planeNormal.normalized;
+        Vector3 toPoint = point - planePoint;
+        float projection = Vector3.Dot(toPoint, n);
+        Vector3 mirrored = point -2*projection*n;
+        return mirrored;
     }
 }

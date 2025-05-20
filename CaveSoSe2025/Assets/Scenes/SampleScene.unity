@@ -408,6 +408,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 342e7afcbea331d4eb1a5836c584ad07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mirrorPlanePoint: {x: 0, y: 0, z: 0.7}
+  mirrorNormal: {x: 0, y: 0, z: 1}
+  handPrefab: {fileID: 4721419266315500366, guid: da8ad94524d55ea4ca6e34ace21530b4, type: 3}
 --- !u!4 &1394094061
 Transform:
   m_ObjectHideFlags: 0
