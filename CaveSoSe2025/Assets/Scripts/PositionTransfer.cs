@@ -118,17 +118,18 @@ public class PositionTransfer : MonoBehaviour
             GameObject cube;
             if (name == "HandLeftCube" || name == "HandRightCube")
             {
-            cube = Instantiate(handPrefab);
+                cube = Instantiate(handPrefab);
             }
-            else{
+            else
+            {
                 cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
                 Renderer renderer = cube.GetComponent<Renderer>();
-                renderer.material.color = new Color(1f, 0.41f, 0.71f); 
+                renderer.material.color = new Color(1f, 0.41f, 0.71f);
             }
 
             cube.name = name;
-            if (cube.GetComponent<Rigidbody>() ==null)
+            if (cube.GetComponent<Rigidbody>() == null)
             {
                 Rigidbody rb = cube.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
@@ -169,22 +170,23 @@ public class PositionTransfer : MonoBehaviour
             jointLines[name] = lr;
         }
 
-       /* Vector3 posA = jointA.position + new Vector3(0, 0, 1.3f);
-        Vector3 posB = jointB.position + new Vector3(0, 0, 1.3f);
+        /* Vector3 posA = jointA.position + new Vector3(0, 0, 1.3f);
+         Vector3 posB = jointB.position + new Vector3(0, 0, 1.3f);
 
-        jointLines[name].SetPosition(0, posA);
-        jointLines[name].SetPosition(1, posB);*/
+         jointLines[name].SetPosition(0, posA);
+         jointLines[name].SetPosition(1, posB);*/
         Vector3 mirroredA = MirrorJoint(jointA.position, mirrorPlanePoint, mirrorNormal);
         Vector3 mirroredB = MirrorJoint(jointB.position, mirrorPlanePoint, mirrorNormal);
         jointLines[name].SetPosition(0, mirroredA);
         jointLines[name].SetPosition(1, mirroredB);
     }
 
-    Vector3 MirrorJoint(Vector3 point, Vector3 planePoint, Vector3 planeNormal){
+    Vector3 MirrorJoint(Vector3 point, Vector3 planePoint, Vector3 planeNormal)
+    {
         Vector3 n = planeNormal.normalized;
         Vector3 toPoint = point - planePoint;
         float projection = Vector3.Dot(toPoint, n);
-        Vector3 mirrored = point -2*projection*n;
+        Vector3 mirrored = point - 2 * projection * n;
         return mirrored;
     }
 }
