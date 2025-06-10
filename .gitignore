@@ -69,6 +69,11 @@ sysinfo.txt
 *.x86_64
 *.x86
 
+# Blender files
+*.blend
+*.blend1
+*.blend1.meta
+
 # Crashlytics generated file
 crashlytics-build.properties
 
