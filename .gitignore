@@ -69,6 +69,11 @@ sysinfo.txt
 *.x86_64
 *.x86
 
+# Blender files
+*.blend
+*.blend1
+*.blend1.meta
+
 # Crashlytics generated file
 crashlytics-build.properties
 
@@ -88,3 +93,4 @@ com.unity.textmeshpro
 
 # Mac general files
 .DS_Store
+CaveSoSe2025/Assets/Samples/CAVE/1.1.1/CAVE Tools/Prefab/ActorFigure.blend
