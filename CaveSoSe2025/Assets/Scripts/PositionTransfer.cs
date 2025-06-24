@@ -12,6 +12,11 @@ public class PositionTransfer : MonoBehaviour
     public Vector3 mirrorPlanePoint = new Vector3(0, 0, 0);
     public Vector3 mirrorNormal = Vector3.forward;
     public GameObject handPrefab;
+    public GameObject headPrefab;
+    public GameObject bodyPrefab;
+
+    public ParticleSystem particlePrefab;
+    public AudioClip collisionSound;
 
     //Dictionariey of the avatar objects and lines that should be updated per frame
     private Dictionary<string, GameObject> jointCubes = new Dictionary<string, GameObject>();
@@ -43,6 +48,8 @@ public class PositionTransfer : MonoBehaviour
         {
             UpdateCubesAndLines();
         }
+
+
     }
 
     // Initializing with the correct Filestructure
@@ -116,30 +123,41 @@ public class PositionTransfer : MonoBehaviour
         if (!jointCubes.ContainsKey(name))
         {
             GameObject cube;
+
             if (name == "HandLeftCube" || name == "HandRightCube")
             {
                 cube = Instantiate(handPrefab);
             }
+            else if (name == "HeadCube")
+            {
+                cube = Instantiate(headPrefab);
+            }
             else
             {
-                cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                Renderer renderer = cube.GetComponent<Renderer>();
-                renderer.material.color = new Color(1f, 0.41f, 0.71f);
+                cube = Instantiate(bodyPrefab);
+                /*cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                  cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                  Renderer renderer = cube.GetComponent<Renderer>();
+                  renderer.material.color = new Color(1f, 0.41f, 0.71f);*/
             }
 
             cube.name = name;
             if (cube.GetComponent<Rigidbody>() == null)
             {
                 Rigidbody rb = cube.AddComponent<Rigidbody>();
-                rb.isKinematic = true;
+                //rb.isKinematic = false;
             }
             if (cube.GetComponent<Collider>() == null)
             {
                 cube.AddComponent<BoxCollider>();
-                Debug.Log("Collider");
             }
-            cube.AddComponent<BodyCollision>();
+           // cube.AddComponent<BodyCollision>();
+            BodyCollision bodyCollision = cube.AddComponent<BodyCollision>();
+            if (particlePrefab != null)
+            {
+                bodyCollision.SetParticleEffect(particlePrefab);
+                bodyCollision.SetCollisionSound(collisionSound);
+            }
 
             jointCubes[name] = cube;
         }
@@ -162,8 +180,9 @@ public class PositionTransfer : MonoBehaviour
             GameObject lineObj = new GameObject(name);
             LineRenderer lr = lineObj.AddComponent<LineRenderer>();
             lr.material = new Material(Shader.Find("Sprites/Default"));
-            lr.startColor = Color.red;
-            lr.endColor = Color.green;
+            Color silver = new Color(0.75f, 0.75f, 0.75f); // RGB für silber/grau
+            lr.startColor = silver;
+            lr.endColor = silver;
             lr.startWidth = 0.02f;
             lr.endWidth = 0.02f;
             lr.positionCount = 2;
