@@ -18,7 +18,7 @@ public class BodyCollision : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log($"{gameObject.name} hat {collision.gameObject.name} berührt");
+        // Debug.Log($"{gameObject.name} hat {collision.gameObject.name} berührt");
         if (gameObject.tag == "Hand" && collision.gameObject.tag == "Hand"){
            if (collision.contacts.Length > 0)
             {

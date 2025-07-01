@@ -19,7 +19,7 @@ public class PositionTransfer : MonoBehaviour
     public AudioClip collisionSound;
 
     //Dictionariey of the avatar objects and lines that should be updated per frame
-    private Dictionary<string, GameObject> jointCubes = new Dictionary<string, GameObject>();
+    public Dictionary<string, GameObject> jointCubes = new Dictionary<string, GameObject>();
     private Dictionary<string, LineRenderer> jointLines = new Dictionary<string, LineRenderer>();
 
     private bool jointsInitialized = false;
