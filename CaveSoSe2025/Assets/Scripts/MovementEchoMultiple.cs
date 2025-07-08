@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MovementEchoMultiple : MonoBehaviour
 {
-    // Positionstransfer enthält die aktuellen Positionen des Spiegel Avatars
+    // Positionstransfer enthält die aktuellen Positionen des Spiegel-Avatars
     public PositionTransfer tracker;
 
     public float recordingDuration;
@@ -16,36 +16,44 @@ public class MovementEchoMultiple : MonoBehaviour
     private bool isRecording = false;
     private float timer = 0f;
 
+    // Liste aller aktuellen aufgenommenen Positionen
     private List<Dictionary<string, Vector3>> recordedFrames = new List<Dictionary<string, Vector3>>();
     public BoxCollider spawnArea;
 
+ 
     // Speichern der mehreren Echo Instanzen
     private int echoIndex = 0;
+
+    // Offsets für alle jewweiligen Instanzen
     private List<Vector3> echoOffsets = new List<Vector3>();
 
     private List<(string from, string to)> boneConnections = new List<(string, string)>
 {
-    ("Head", "Neck"),
-    ("Neck", "Spine"),
-    ("Spine", "Hip"),
-    ("LeftShoulder", "LeftElbow"),
-    ("LeftElbow", "LeftHand"),
-    ("RightShoulder", "RightElbow"),
-    ("RightElbow", "RightHand"),
-    ("LeftHip", "LeftKnee"),
-    ("LeftKnee", "LeftFoot"),
-    ("RightHip", "RightKnee"),
-    ("RightKnee", "RightFoot"),
+    ("HeadCube", "NeckCube"),
+    ("NeckCube", "SpineMidCube"),
+    ("SpineMidCube", "SpineBaseCube"),
+    ("SpineBaseCube", "HipLeftCube"),
+    ("SpineBaseCube", "HipRightCube"),
+    ("ShoulderLeftCube", "ElbowLeftCube"),
+    ("ElbowLeftCube", "HandLeftCube"),
+    ("ShoulderRightCube", "ElbowRightCube"),
+    ("ElbowRightCube", "HandRightCube"),
+    ("HipLeftCube", "KneeLeftCube"),
+    ("KneeLeftCube", "AnkleLeftCube"),
+    ("AnkleLeftCube", "FootLeftCube"),
+    ("HipRightCube", "KneeRightCube"),
+    ("KneeRightCube", "AnkleRightCube"),
+    ("AnkleRightCube", "FootRightCube"),
 };
-
-    private List<LineRenderer> allEchoLines = new List<LineRenderer>();
-    private List<(Transform from, Transform to)> lineEndpoints = new List<(Transform, Transform)>();
+    // Alle Punkte zum Linine rendern speichern
+    private List<List<(Transform from, Transform to)>> allLineEndpoints = new List<List<(Transform, Transform)>>();
+    private List<List<LineRenderer>> allLineRenderers = new List<List<LineRenderer>>();
 
     //Lösungsansatz wie man from to so aktualisiert, dass der Lihne Renderer korrekt gesetzt wird...
 
     void Start()
     {
-        Invoke("StartRecording", 5f);
+        Invoke("StartRecording", 10f);
     }
 
     void Update()
@@ -110,28 +118,35 @@ public class MovementEchoMultiple : MonoBehaviour
         Dictionary<string, GameObject> echoDict = new Dictionary<string, GameObject>();
         var baseFrame = recordedFrames[0];
 
+        List<(Transform, Transform)> echoLineEndpoints = new List<(Transform, Transform)>();
+        List<LineRenderer> echoLines = new List<LineRenderer>();
+
         foreach (var pair in baseFrame)
         {
             var original = tracker.jointCubes[pair.Key];
-
             Vector3 worldPosWithOffset = pair.Value + offset;
-
             var echo = Instantiate(original, worldPosWithOffset, Quaternion.identity);
             echo.name = pair.Key + "_Echo_" + index;
             echo.transform.SetParent(echoParent.transform);
             echoDict[pair.Key] = echo;
         }
-        
+
         foreach (var (from, to) in boneConnections)
         {
+           Debug.Log($"Checking bone connection {from} {to}: FoundFrom={echoDict.ContainsKey(from)}, FoundTo={echoDict.ContainsKey(to)}");
+
             if (echoDict.ContainsKey(from) && echoDict.ContainsKey(to))
             {
-                CreateEchoLine($"{from}_{to}_Line_{index}",
-                    echoDict[from].transform,
-                    echoDict[to].transform,
-                    echoParent.transform);
+                var fromTf = echoDict[from].transform;
+                var toTf = echoDict[to].transform;
+                var lr = CreateEchoLine($"{from}_{to}_Line_{index}", fromTf, toTf, echoParent.transform);
+                echoLines.Add(lr);
+                echoLineEndpoints.Add((fromTf, toTf));
             }
         }
+
+        allLineEndpoints.Add(echoLineEndpoints);
+        allLineRenderers.Add(echoLines);
 
         return echoDict;
     }
@@ -189,7 +204,7 @@ public class MovementEchoMultiple : MonoBehaviour
         yield return new WaitForSeconds(1f);
         StartRecording();
     }
-    void CreateEchoLine(string name, Transform from, Transform to, Transform parent)
+    LineRenderer CreateEchoLine(string name, Transform from, Transform to, Transform parent)
     {
         GameObject lineObj = new GameObject(name);
         lineObj.transform.SetParent(parent);
@@ -203,21 +218,26 @@ public class MovementEchoMultiple : MonoBehaviour
         lr.endWidth = 0.015f;
         lr.positionCount = 2;
 
-        allEchoLines.Add(lr);
-        lineEndpoints.Add((from, to));
+        return lr;
     }
 
     void UpdateLineRenderer()
     {
-        for (int i = 0; i < allEchoLines.Count; i++)
+        for (int echo = 0; echo < allLineRenderers.Count; echo++)
         {
-            var lr = allEchoLines[i];
-            var (from, to) = lineEndpoints[i];
+            var lineRenderers = allLineRenderers[echo];
+            var endpoints = allLineEndpoints[echo];
 
-            if (from != null && to != null)
+            for (int i = 0; i < lineRenderers.Count; i++)
             {
-                lr.SetPosition(0, from.position);
-                lr.SetPosition(1, to.position);
+                var lr = lineRenderers[i];
+                var (from, to) = endpoints[i];
+
+                if (from != null && to != null)
+                {
+                    lr.SetPosition(0, from.position);
+                    lr.SetPosition(1, to.position);
+                }
             }
         }
     }
