@@ -32,6 +32,8 @@ public class MovementEchoMultiple : MonoBehaviour
     ("HeadCube", "NeckCube"),
     ("NeckCube", "SpineMidCube"),
     ("SpineMidCube", "SpineBaseCube"),
+    ("SpineMidCube", "ShoulderLeftCube"),
+    ("SpineMidCube", "ShoulderRightCube"),
     ("SpineBaseCube", "HipLeftCube"),
     ("SpineBaseCube", "HipRightCube"),
     ("ShoulderLeftCube", "ElbowLeftCube"),
