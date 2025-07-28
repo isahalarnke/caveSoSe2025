@@ -1,14 +1,19 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-
+/// <summary>
+/// Takes the tracked Kinect positions from the Kinect Actor instances (Cave --> Kinect Tracker --> Kinect Actor # ...)
+/// Transfers the positions of joints and mirrors them to the avatar
+/// Mirrored joints of the avatar are connected by a line renderer
+/// </summary>
 public class PositionTransferMultiple : MonoBehaviour
 {
     private Dictionary<string, GameObject> actors = new Dictionary<string, GameObject>();
-    private Dictionary<string, GameObject> avatarRoots = new Dictionary<string, GameObject>();
+    private Dictionary<string, GameObject> avatarRoots = new Dictionary<string, GameObject>(); // Gameobjects containing the body parts and line renderer objects
     public Dictionary<string, Dictionary<string, GameObject>> joints = new Dictionary<string, Dictionary<string, GameObject>>();
     private Dictionary<string, Dictionary<string, LineRenderer>> jointLines = new Dictionary<string, Dictionary<string, LineRenderer>>();
-    private HashSet<string> initializedActors = new HashSet<string>();
+
+    private HashSet<string> initializedActors = new HashSet<string>(); // initialized actors to compare which actors are not tracked anymore
 
     public Vector3 mirrorPlanePoint = new Vector3(0, 0, 0);
     public Vector3 mirrorNormal = Vector3.forward;
@@ -19,7 +24,12 @@ public class PositionTransferMultiple : MonoBehaviour
     public ParticleSystem particlePrefab;
     public AudioClip collisionSound;
 
-
+    /// <summary>
+    /// Actors are found by their Tag "Player" and name which is "Kinect Actor #id" (id is a unique long number).
+    /// If actor not already initialized add them to the HashSet.
+    /// If actor doesn't exist, delete it from the Hashset.
+    /// Update for each initialized and existing avatar the positions of the Bodyparts and lines.
+    /// </summary>
     void Update()
     {
         GameObject[] foundActors = GameObject.FindGameObjectsWithTag("Player");
@@ -82,6 +92,11 @@ public class PositionTransferMultiple : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Assigns body parts by locating them through their hierarchy path.
+    /// </summary>
+    /// <param name="actorId">The unique id for the avatar.</param>
+    /// <param name="actor">The Kinect actor object.</param>
     void InitializeJoints(string actorId, GameObject actor)
     {
         Dictionary<string, Transform> joints = new Dictionary<string, Transform>
@@ -118,7 +133,9 @@ public class PositionTransferMultiple : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Updates positions of bodyparts and lines.
+    /// </summary>
     void UpdateBodypartsAndLines(string actorId)
     {
         GameObject actor = actors[actorId];
@@ -173,13 +190,18 @@ public class PositionTransferMultiple : MonoBehaviour
     }
 
 
-    // Updates or instantiates bodyparts
+    /// <summary>
+    /// Updates or instantiates bodyparts.
+    /// </summary>
+    /// <param name="actorId">The unique id for the avatar.</param>
+    /// <param name="name">The name of the body part.</param>
+    /// <param name="joint">The specific bodypart.</param>
     void UpdateBodypart(string actorId, string name, Transform joint)
     {
         if (joint == null) return;
 
-        var cubes = joints[actorId];
-        if (!cubes.ContainsKey(name))
+        var bodyParts = joints[actorId];
+        if (!bodyParts.ContainsKey(name))
         {
             GameObject bodypart;
 
@@ -205,15 +227,21 @@ public class PositionTransferMultiple : MonoBehaviour
                 bodyCollision.SetCollisionSound(collisionSound);
             }
 
-            cubes[name] = bodypart;
+            bodyParts[name] = bodypart;
         }
 
         Vector3 mirroredPosition = MirrorJoint(joint.position, mirrorPlanePoint, mirrorNormal);
-        cubes[name].transform.position = mirroredPosition;
+        bodyParts[name].transform.position = mirroredPosition;
     }
 
+    /// <summary>
+    /// Visualization between joints, updates start and end position of line or instatiated depending if actor or joints and lines are already instantiated.
+    /// </summary>
+    /// <param name="actorId">The unique id for the avatar.</param>
+    /// <param name="name">The name of the body part.</param>
+    /// <param name="jointA">The first body part to be connected with jointB.</param>
+    /// <param name="jointB">The second body part to be connected with jointA.</param>
 
-    // Visualization between joints, updates start and end position of line or instatiated depending if actor or joints and lines are already instantiated
     void UpdateLine(string actorId, string name, Transform jointA, Transform jointB)
     {
         if (jointA == null || jointB == null) return;
@@ -240,8 +268,14 @@ public class PositionTransferMultiple : MonoBehaviour
         lines[name].SetPosition(0, mirroredA);
         lines[name].SetPosition(1, mirroredB);
     }
-
-    // Mirrors a given point i relation to given plane and its normal
+    /// <summary>
+    /// Mirrors a given point in relation to given plane and its normal.
+    /// </summary>
+    /// <param name="point">Point to be mirrored (body part position).</param>
+    /// <param name="planePoint">Point on a plane as a reference for mirroring.</param>
+    /// <param name="planeNormal">The normal of the plane. </param>
+    /// <returns></returns>
+    /// 
     Vector3 MirrorJoint(Vector3 point, Vector3 planePoint, Vector3 planeNormal)
     {
         Vector3 n = planeNormal.normalized;
