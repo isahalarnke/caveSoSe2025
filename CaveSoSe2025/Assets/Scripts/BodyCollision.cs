@@ -25,16 +25,10 @@ public class BodyCollision : MonoBehaviour
                 Vector3 contactPoint = collision.contacts[0].point;
                 CreateBasicParticleEffect(contactPoint);
                 PlayCollisionSound(contactPoint);
-                Debug.Log("Klatschen");
             }
         }
-        Renderer rend = GetComponent<Renderer>();
-        if (rend != null)
-        {
-           //rend.material.color = Color.red;
-        }
-
     }
+
     void CreateBasicParticleEffect(Vector3 position)
     {
         if (particleEffectPrefab == null)
@@ -45,7 +39,6 @@ public class BodyCollision : MonoBehaviour
        
         ParticleSystem instance = Instantiate(particleEffectPrefab, position, Quaternion.identity);
         instance.Play();
-        Debug.Log("Partikelsystem play");
         Destroy(instance.gameObject, instance.main.startLifetime.constant + 0.2f);
 
         //Variante mit, wenn eigenes Partikelsystem erstellt wird --> besser von außen zu übergeben, mehr Designfreiheit

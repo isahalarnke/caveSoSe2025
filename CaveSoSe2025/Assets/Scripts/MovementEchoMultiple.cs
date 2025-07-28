@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class MovementEchoMultiple : MonoBehaviour
 {
-    // Positionstransfer enthält die aktuellen Positionen des Spiegel-Avatars
-    public PositionTransfer tracker;
+    public PositionTransfer tracker;  // Positionstransfer contains all position of the mirrored avatars
 
     public float recordingDuration;
     public float fps;
@@ -16,42 +15,36 @@ public class MovementEchoMultiple : MonoBehaviour
     private bool isRecording = false;
     private float timer = 0f;
 
-    // Liste aller aktuellen aufgenommenen Positionen
+    // List of all recorded positions
     private List<Dictionary<string, Vector3>> recordedFrames = new List<Dictionary<string, Vector3>>();
     public BoxCollider spawnArea;
 
- 
-    // Speichern der mehreren Echo Instanzen
-    private int echoIndex = 0;
+    private int echoIndex = 0; // Index / counter for Echo instances
+    private List<Vector3> echoOffsets = new List<Vector3>();  // Offsets for the echo instances
 
-    // Offsets für alle jewweiligen Instanzen
-    private List<Vector3> echoOffsets = new List<Vector3>();
-
-    private List<(string from, string to)> boneConnections = new List<(string, string)>
-{
-    ("HeadCube", "NeckCube"),
-    ("NeckCube", "SpineMidCube"),
-    ("SpineMidCube", "SpineBaseCube"),
-    ("SpineMidCube", "ShoulderLeftCube"),
-    ("SpineMidCube", "ShoulderRightCube"),
-    ("SpineBaseCube", "HipLeftCube"),
-    ("SpineBaseCube", "HipRightCube"),
-    ("ShoulderLeftCube", "ElbowLeftCube"),
-    ("ElbowLeftCube", "HandLeftCube"),
-    ("ShoulderRightCube", "ElbowRightCube"),
-    ("ElbowRightCube", "HandRightCube"),
-    ("HipLeftCube", "KneeLeftCube"),
-    ("KneeLeftCube", "AnkleLeftCube"),
-    ("AnkleLeftCube", "FootLeftCube"),
-    ("HipRightCube", "KneeRightCube"),
-    ("KneeRightCube", "AnkleRightCube"),
-    ("AnkleRightCube", "FootRightCube"),
-};
-    // Alle Punkte zum Linine rendern speichern
+    private List<(string from, string to)> boneConnections = new List<(string, string)> {
+        ("Head", "Neck"),
+        ("Neck", "SpineMid"),
+        ("SpineMid", "SpineBase"),
+        ("SpineMid", "ShoulderLeft"),
+        ("SpineMid", "ShoulderRight"),
+        ("SpineBase", "HipLeft"),
+        ("SpineBase", "HipRight"),
+        ("ShoulderLeft", "ElbowLeft"),
+        ("ElbowLeft", "HandLeft"),
+        ("ShoulderRight", "ElbowRight"),
+        ("ElbowRight", "HandRight"),
+        ("HipLeft", "KneeLeft"),
+        ("KneeLeft", "AnkleLeft"),
+        ("AnkleLeft", "FootLeft"),
+        ("HipRight", "KneeRight"),
+        ("KneeRight", "AnkleRight"),
+        ("AnkleRight", "FootRight"),
+    };
+    // All points for the line renderer
     private List<List<(Transform from, Transform to)>> allLineEndpoints = new List<List<(Transform, Transform)>>();
     private List<List<LineRenderer>> allLineRenderers = new List<List<LineRenderer>>();
 
-    //Lösungsansatz wie man from to so aktualisiert, dass der Lihne Renderer korrekt gesetzt wird...
 
     void Start()
     {
@@ -60,7 +53,7 @@ public class MovementEchoMultiple : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T)) // nur zum Testen im Unity Editor
+        if (Input.GetKeyDown(KeyCode.T)) // only for testing in the Unity editor
         {
             Debug.Log("T key recording starting");
             StartRecording();
@@ -71,7 +64,7 @@ public class MovementEchoMultiple : MonoBehaviour
             timer += Time.deltaTime;
             RecordFrame();
 
-            //Wenn isRecording auf false gesetzt wird --> keine weitere Speicherung der Bewegungsdaten in Liste Recorded Frames deshalb dann allen allRecordedFrames hinzufügen
+            // if isRecordign is set to false --> no more adding position point to list recordedFrames, therefore adding to allRecordedFrames
             if (timer >= recordingDuration)
             {
                 isRecording = false;
@@ -82,12 +75,13 @@ public class MovementEchoMultiple : MonoBehaviour
         UpdateLineRenderer();
     }
 
+    // Plays sound of recording begins, sets timer to 0
     public void StartRecording()
     {
         recordedFrames = new List<Dictionary<string, Vector3>>();
         timer = 0f;
         isRecording = true;
-        Debug.Log("Aufzeichnung gestartet.");
+        Debug.Log("Recording started.");
         if (recordSound == null) return;
 
         GameObject soundObj = new GameObject("RecordSound");
@@ -98,6 +92,7 @@ public class MovementEchoMultiple : MonoBehaviour
 
         Destroy(soundObj, recordSound.length + 0.1f);
     }
+
 
     void RecordFrame()
     {
@@ -179,7 +174,7 @@ public class MovementEchoMultiple : MonoBehaviour
         }
     }
 
-    // Zufällige Position in dem Boxcollider Spawn Area, um die neuen Avatare zu instanziieren
+    // Random poisiton in the box collider spawn area
     Vector3 GetRandomPositionInBox(BoxCollider box)
     {
         Vector3 center = box.transform.position;
@@ -194,11 +189,13 @@ public class MovementEchoMultiple : MonoBehaviour
 
         return center + randomPosition;
     }
+
+    // Bringing after recording Echo will be replayed and new a recording begins
     IEnumerator HandleReplayAndNextRecording()
     {
         var echo = CreateEcho(echoIndex);
 
-        // Kopie der aktuellen Aufzeichnung übergeben
+        // Copy of the last recording
         var framesToReplay = allRecordedFrames.Last();
 
         StartCoroutine(ReplayEcho(echo, framesToReplay, echoIndex));
@@ -206,6 +203,8 @@ public class MovementEchoMultiple : MonoBehaviour
         yield return new WaitForSeconds(1f);
         StartRecording();
     }
+
+    // Line Renderer
     LineRenderer CreateEchoLine(string name, Transform from, Transform to, Transform parent)
     {
         GameObject lineObj = new GameObject(name);

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class PositionTransfer : MonoBehaviour
 {
     private GameObject actor;
+    private GameObject avatarRoot;
     private Transform head, neck, hipLeft, hipRight, spineBase, spineMid;
     private Transform shoulderLeft, shoulderRight, elbowLeft, elbowRight;
     private Transform handLeft, handRight, kneeLeft, kneeRight;
@@ -18,7 +20,7 @@ public class PositionTransfer : MonoBehaviour
     public ParticleSystem particlePrefab;
     public AudioClip collisionSound;
 
-    //Dictionariey of the avatar objects and lines that should be updated per frame
+    // Dictionary of the avatar objects and lines that should be updated per frame
     public Dictionary<string, GameObject> jointCubes = new Dictionary<string, GameObject>();
     private Dictionary<string, LineRenderer> jointLines = new Dictionary<string, LineRenderer>();
 
@@ -33,7 +35,7 @@ public class PositionTransfer : MonoBehaviour
             // To update every joint again
             jointsInitialized = false;
             if (actor != null)
-                Debug.Log("Player gefunden und Position: " + actor.transform.position);
+                Debug.Log("Player found at position: " + actor.transform.position);
         }
 
         // Initialize when needed
@@ -41,18 +43,22 @@ public class PositionTransfer : MonoBehaviour
         {
             InitializeJoints();
             jointsInitialized = true;
+            if (avatarRoot == null)
+            {
+                avatarRoot = new GameObject("Avatar");
+            }
         }
 
         // Update visual cubes and lines every frame
         if (jointsInitialized)
         {
-            UpdateCubesAndLines();
+            UpdateBodypartsAndLines();
         }
 
 
     }
 
-    // Initializing with the correct Filestructure
+    // Initializing with the correct path
     void InitializeJoints()
     {
         head = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Neck/Head");
@@ -75,26 +81,26 @@ public class PositionTransfer : MonoBehaviour
         handRight = actor.transform.Find("Spine Base/Spine Mid/Spine Shoulder/Shoulder Right/Elbow Right/Wrist Right/Hand Right");
     }
 
-    void UpdateCubesAndLines()
+    void UpdateBodypartsAndLines()
     {
-        UpdateCube("HeadCube", head);
-        UpdateCube("NeckCube", neck);
-        UpdateCube("SpineBaseCube", spineBase);
-        UpdateCube("SpineMidCube", spineMid);
-        UpdateCube("HipLeftCube", hipLeft);
-        UpdateCube("HipRightCube", hipRight);
-        UpdateCube("KneeLeftCube", kneeLeft);
-        UpdateCube("KneeRightCube", kneeRight);
-        UpdateCube("AnkleLeftCube", ankleLeft);
-        UpdateCube("AnkleRightCube", ankleRight);
-        UpdateCube("FootLeftCube", footLeft);
-        UpdateCube("FootRightCube", footRight);
-        UpdateCube("ShoulderLeftCube", shoulderLeft);
-        UpdateCube("ShoulderRightCube", shoulderRight);
-        UpdateCube("ElbowLeftCube", elbowLeft);
-        UpdateCube("ElbowRightCube", elbowRight);
-        UpdateCube("HandLeftCube", handLeft);
-        UpdateCube("HandRightCube", handRight);
+        UpdateBodypart("Head", head);
+        UpdateBodypart("Neck", neck);
+        UpdateBodypart("SpineBase", spineBase);
+        UpdateBodypart("SpineMid", spineMid);
+        UpdateBodypart("HipLeft", hipLeft);
+        UpdateBodypart("HipRight", hipRight);
+        UpdateBodypart("KneeLeft", kneeLeft);
+        UpdateBodypart("KneeRight", kneeRight);
+        UpdateBodypart("AnkleLeft", ankleLeft);
+        UpdateBodypart("AnkleRight", ankleRight);
+        UpdateBodypart("FootLeft", footLeft);
+        UpdateBodypart("FootRight", footRight);
+        UpdateBodypart("ShoulderLeft", shoulderLeft);
+        UpdateBodypart("ShoulderRight", shoulderRight);
+        UpdateBodypart("ElbowLeft", elbowLeft);
+        UpdateBodypart("ElbowRight", elbowRight);
+        UpdateBodypart("HandLeft", handLeft);
+        UpdateBodypart("HandRight", handRight);
 
         UpdateLine("Line_Neck_Head", neck, head);
         UpdateLine("Line_SpineMid_Neck", spineMid, neck);
@@ -115,62 +121,54 @@ public class PositionTransfer : MonoBehaviour
         UpdateLine("Line_AnkleRight_FootRight", ankleRight, footRight);
     }
 
-    // Updates or creates cubes 
-    void UpdateCube(string name, Transform joint)
+    // Updates or instantiates bodyparts
+    void UpdateBodypart(string name, Transform joint)
     {
         if (joint == null) return;
 
         if (!jointCubes.ContainsKey(name))
         {
-            GameObject cube;
+            GameObject bodypart;
 
-            if (name == "HandLeftCube" || name == "HandRightCube")
+            if (name == "HandLeft" || name == "HandRight")
             {
-                cube = Instantiate(handPrefab);
+                bodypart = Instantiate(handPrefab);
             }
-            else if (name == "HeadCube")
+            else if (name == "Head")
             {
-                cube = Instantiate(headPrefab);
+                bodypart = Instantiate(headPrefab);
             }
             else
             {
-                cube = Instantiate(bodyPrefab);
-                /*cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                  cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                  Renderer renderer = cube.GetComponent<Renderer>();
-                  renderer.material.color = new Color(1f, 0.41f, 0.71f);*/
+                bodypart = Instantiate(bodyPrefab);
             }
 
-            cube.name = name;
-            if (cube.GetComponent<Rigidbody>() == null)
+            bodypart.name = name;
+            if (bodypart.GetComponent<Rigidbody>() == null)
             {
-                Rigidbody rb = cube.AddComponent<Rigidbody>();
-                //rb.isKinematic = false;
+                Rigidbody rb = bodypart.AddComponent<Rigidbody>();
             }
-            if (cube.GetComponent<Collider>() == null)
+            if (bodypart.GetComponent<Collider>() == null)
             {
-                cube.AddComponent<BoxCollider>();
+                bodypart.AddComponent<BoxCollider>();
             }
-           // cube.AddComponent<BodyCollision>();
-            BodyCollision bodyCollision = cube.AddComponent<BodyCollision>();
+
+            BodyCollision bodyCollision = bodypart.AddComponent<BodyCollision>();
             if (particlePrefab != null)
             {
                 bodyCollision.SetParticleEffect(particlePrefab);
                 bodyCollision.SetCollisionSound(collisionSound);
             }
-
-            jointCubes[name] = cube;
+            bodypart.transform.parent = avatarRoot.transform;
+            jointCubes[name] = bodypart;
         }
 
-        // Offset z-axis for th avatar visualization
-        /*Vector3 offsetPosition = joint.position + new Vector3(0, 0, 1.3f);
-        jointCubes[name].transform.position = offsetPosition;*/
         Vector3 mirroredPosition = MirrorJoint(joint.position, mirrorPlanePoint, mirrorNormal);
         jointCubes[name].transform.position = mirroredPosition;
 
     }
 
-    //Visualization between joints, updates start and end position of line or instatiated depending if actor or joints and lines are already instantiated
+    // Visualization between joints, updates start and end position of line or instatiated depending if actor or joints and lines are already instantiated
     void UpdateLine(string name, Transform jointA, Transform jointB)
     {
         if (jointA == null || jointB == null) return;
@@ -188,18 +186,14 @@ public class PositionTransfer : MonoBehaviour
             lr.positionCount = 2;
             jointLines[name] = lr;
         }
-
-        /* Vector3 posA = jointA.position + new Vector3(0, 0, 1.3f);
-         Vector3 posB = jointB.position + new Vector3(0, 0, 1.3f);
-
-         jointLines[name].SetPosition(0, posA);
-         jointLines[name].SetPosition(1, posB);*/
         Vector3 mirroredA = MirrorJoint(jointA.position, mirrorPlanePoint, mirrorNormal);
         Vector3 mirroredB = MirrorJoint(jointB.position, mirrorPlanePoint, mirrorNormal);
+        jointLines[name].transform.parent = avatarRoot.transform;
         jointLines[name].SetPosition(0, mirroredA);
         jointLines[name].SetPosition(1, mirroredB);
     }
 
+    // Mirrors a given point i relation to given plane and its normal
     Vector3 MirrorJoint(Vector3 point, Vector3 planePoint, Vector3 planeNormal)
     {
         Vector3 n = planeNormal.normalized;
