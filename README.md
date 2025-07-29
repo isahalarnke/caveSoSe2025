@@ -41,7 +41,7 @@ Die Kinect erfasst die Positionen der Gelenke der interagierenden Person. Diese 
 - Körperteil Prefabs, Sound und Partikelsystem für die Kollisionen können über den Inspektor gesetzt werden
 ---
 
-### 2. `MovementEchoMultiple2.cs`
+### 2. `MovementEchoMultiple.cs`
 
 > **Funktion:** Nimmt Bewegungen (Körperteilpositionen aus PositionTransferMultiple.cs) über selbstfestgelegten einen Zeitraum auf und spielt sie zeitversetzt als "Echos" erneut ab. Muss einem leeren GameObject in der Szene zugeteilt werden.
 
