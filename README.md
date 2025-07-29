@@ -32,7 +32,7 @@ Die Kinect erfasst die Positionen der Gelenke der interagierenden Person. Diese 
 ## Projektstruktur und Skripte
 ### 1. `PositionTransferMultiple.cs`
 
-> **Funktion:** Überträgt und spiegelt die Bewegungsdaten von der Kinect vom (CAVE--> Kinect Tracker --> Kinect Actor #) auf einen Avatar.
+> **Funktion:** Überträgt und spiegelt die Bewegungsdaten von der Kinect vom (CAVE--> Kinect Tracker --> Kinect Actor #) auf einen Avatar. Muss einem leeren GameObject in der Szene zugeteilt werden.
 
 - Liest ausgewählte Gelenkpositionen von "Kinect Actor #ID" GameObject
 - Erstellt und verwaltet 3D-Körperteile (Head, Hand, Body) für jeden Avatar und fügt das BodyCollision.cs an sie an
@@ -43,7 +43,7 @@ Die Kinect erfasst die Positionen der Gelenke der interagierenden Person. Diese 
 
 ### 2. `MovementEchoMultiple2.cs`
 
-> **Funktion:** Nimmt Bewegungen (Körperteilpositionen aus PositionTransferMultiple.cs) über selbstfestgelegten einen Zeitraum auf und spielt sie zeitversetzt als "Echos" erneut ab.
+> **Funktion:** Nimmt Bewegungen (Körperteilpositionen aus PositionTransferMultiple.cs) über selbstfestgelegten einen Zeitraum auf und spielt sie zeitversetzt als "Echos" erneut ab. Muss einem leeren GameObject in der Szene zugeteilt werden.
 
 - Aufzeichnung der Gelenkpositionen pro Avatar
 - Periodische Replays mit versetzter zufälliger räumlicher Position (Vorgegene Spawn Area)
