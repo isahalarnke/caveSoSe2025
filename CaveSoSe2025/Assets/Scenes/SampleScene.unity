@@ -792,7 +792,7 @@ MonoBehaviour:
   recordSound: {fileID: 8300000, guid: 9a6c6c6c5300cc346b150e4fafb4f466, type: 3}
   spawnArea: {fileID: 257459379}
   particlePrefab: {fileID: 2044104926}
-  collisionSound: {fileID: 8300000, guid: 89d1fcd2b23a3894fb3a294bda493116, type: 3}
+  collisionSound: {fileID: 0}
 --- !u!1001 &948237271
 PrefabInstance:
   m_ObjectHideFlags: 0
