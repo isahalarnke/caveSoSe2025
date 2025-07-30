@@ -8,6 +8,7 @@ TagManager:
   - CubeSpawner
   - TestActor
   - Hand
+  - Start
   layers:
   - Default
   - TransparentFX
